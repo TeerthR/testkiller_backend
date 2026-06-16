@@ -1,0 +1,14 @@
+package com.testkiller.entity.enums;
+
+public enum Type{
+	SINGLE_CHOICE,
+	MULTIPLE_CHOICE, 
+	TRUE_FALSE, 
+	FILL_IN_BLANK, 
+	DESCRIPTIVE, 
+	NUMERICAL, 
+	MATCH_FOLLOWING, 
+	IMAGE_BASED, 
+	AUDIO_BASED, 
+	CODING
+}

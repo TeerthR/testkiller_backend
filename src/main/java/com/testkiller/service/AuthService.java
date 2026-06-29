@@ -87,12 +87,18 @@ public class AuthService {
 			passwordResetTokenRepository.save(resetToken);
 
 			String resetLink = baseUrl + "/reset-password?token=" + rawToken + "&email=" + email;
+			System.out.println("=== PASSWORD RESET LINK: " + resetLink + " ===");
 
 			SimpleMailMessage message = new SimpleMailMessage();
 			message.setTo(email);
 			message.setSubject("Testkiller Password Reset");
 			message.setText("Click to reset your Testkiller password (expires in 15 minutes):\n" + resetLink);
-			javaMailSender.send(message);
+			
+			try {
+				javaMailSender.send(message);
+			} catch (Exception e) {
+				System.err.println("SMTP email sending failed: " + e.getMessage());
+			}
 		});
 	}
 

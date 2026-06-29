@@ -10,7 +10,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.testkiller.config.JwtUtil;
 import com.testkiller.dto.LoginRequest;
+import com.testkiller.dto.LoginResponse;
 import com.testkiller.dto.ResetPasswordRequest;
 import com.testkiller.dto.SignupRequest;
 import com.testkiller.dto.UserResponse;
@@ -31,18 +33,20 @@ public class AuthService {
 	private final ModelMapper modelMapper;
 	private final JavaMailSender javaMailSender;
 	private final PasswordResetTokenRepository passwordResetTokenRepository;
+	private final JwtUtil jwtUtil;
 
 	@Value("${app.frontend.url}")
 	private String baseUrl;
 
 	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
 			ModelMapper modelMapper, JavaMailSender javaMailSender,
-			PasswordResetTokenRepository passwordResetTokenRepository) {
+			PasswordResetTokenRepository passwordResetTokenRepository, JwtUtil jwtUtil) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.modelMapper = modelMapper;
 		this.javaMailSender = javaMailSender;
 		this.passwordResetTokenRepository = passwordResetTokenRepository;
+		this.jwtUtil = jwtUtil;
 	}
 
 	public UserResponse signupUser(SignupRequest req) {
@@ -58,13 +62,15 @@ public class AuthService {
 		return modelMapper.map(savedUser, UserResponse.class);
 	}
 
-	public UserResponse loginUser(LoginRequest req) {
+	public LoginResponse loginUser(LoginRequest req) {
 		User user = userRepository.findByEmail(req.getEmail())
 				.orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 		if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
 			throw new InvalidCredentialsException("Invalid email or password");
 		}
-		return modelMapper.map(user, UserResponse.class);
+		String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+		UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+		return new LoginResponse(token, userResponse);
 	}
 
 	public void forgotPassword(String email) {

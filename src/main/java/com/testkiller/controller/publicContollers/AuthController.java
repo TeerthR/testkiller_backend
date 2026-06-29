@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.testkiller.dto.ApiResponse;
 import com.testkiller.dto.ForgotPasswordRequest;
 import com.testkiller.dto.LoginRequest;
+import com.testkiller.dto.LoginResponse;
 import com.testkiller.dto.ResetPasswordRequest;
 import com.testkiller.dto.SignupRequest;
 import com.testkiller.dto.UserResponse;
@@ -38,8 +39,8 @@ public class AuthController{
 	
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponse> loginUser(@Valid @RequestBody LoginRequest req){
-		UserResponse userRes = authService.loginUser(req);
-		ApiResponse apiRes = new ApiResponse(true, "User logged in successfully", userRes);
+		LoginResponse loginRes = authService.loginUser(req);
+		ApiResponse apiRes = new ApiResponse(true, "User logged in successfully", loginRes);
 		return ResponseEntity.ok().body(apiRes);
 	}
 
